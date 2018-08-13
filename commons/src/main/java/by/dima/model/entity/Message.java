@@ -10,6 +10,12 @@ public class Message {
     public Message() {
     }
 
+    public Message(String text, Date date, User user) {
+        this.text = text;
+        this.date = date;
+        this.user = user;
+    }
+
     public String getText() {
         return text;
     }

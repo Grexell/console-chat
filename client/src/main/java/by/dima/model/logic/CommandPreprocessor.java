@@ -1,8 +1,12 @@
 package by.dima.model.logic;
 
+import by.dima.model.entity.Message;
 import by.dima.model.entity.Request;
 import by.dima.util.JasonObjectConverter;
 import by.dima.util.ObjectConverter;
+import by.dima.util.UserHolder;
+
+import java.util.Date;
 
 public class CommandPreprocessor implements RequestPreprocessor {
 
@@ -37,12 +41,13 @@ public class CommandPreprocessor implements RequestPreprocessor {
                 request.setCommand(data.substring(data.indexOf(commandKeyStart) + 1, data.indexOf(commandKeyEnd)));
                 request.setData(DataPreprocessorBuilder.build(request.getCommand()).process(data.substring(data.indexOf(commandKeyEnd) + 1)));
             } else {
-                request.setCommand(data.substring(data.indexOf(commandKeyStart)));
+                request.setCommand(data.substring(data.indexOf(commandKeyStart) + 1));
+                request.setData(DataPreprocessorBuilder.build(request.getCommand()).process(""));
             }
 
         } else {
             request.setCommand(messageCommand);
-            request.setData(data);
+            request.setData(requestObjConverter.write(new Message(data, new Date(), UserHolder.getInstance().getCurrentUser())));
         }
 
         result = requestObjConverter.write(request);

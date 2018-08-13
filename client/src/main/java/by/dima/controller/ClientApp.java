@@ -38,9 +38,14 @@ public class ClientApp {
     public void run() {
         String userInput;
         do {
-            userInput = input.getLine();
-            String userRequest = requestPreprocessor.process(userInput);
-            messageSender.send(userRequest);
+            try{
+                userInput = input.getLine();
+                String userRequest = requestPreprocessor.process(userInput);
+                messageSender.send(userRequest);
+            } catch (Exception ex) {
+                System.out.println(ex.getMessage());
+                userInput = new String();
+            }
         } while (!EXIT_COMMAND.equalsIgnoreCase(userInput));
 
         receiver.setWorking(false);
