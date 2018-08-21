@@ -13,6 +13,10 @@ public class InMemoryAgentService implements AgentService {
         userQueue = new LinkedBlockingQueue<>();
     }
 
+    public InMemoryAgentService(BlockingQueue<User> userQueue) {
+        this.userQueue = userQueue;
+    }
+
     @Override
     public void addAgent(User user) {
         try {

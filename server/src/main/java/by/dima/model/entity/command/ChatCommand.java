@@ -28,6 +28,7 @@ public class ChatCommand implements Command{
         user.setId(socket.getInetAddress() + user.getUsername());
         if (userService.isRegistered(user)) {
             User distUser;
+
             if (Role.AGENT == user.getRole()) {
                 distUser = chatService.chatedUser(user);
             } else {

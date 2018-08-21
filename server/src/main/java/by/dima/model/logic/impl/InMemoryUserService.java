@@ -20,6 +20,10 @@ public class InMemoryUserService implements UserService {
         users = new ConcurrentHashMap<>();
     }
 
+    public InMemoryUserService(Map<User, MessageSender> users) {
+        this.users = users;
+    }
+
     @Override
     public void add(User user, MessageSender messageSender) {
         users.put(user, messageSender);

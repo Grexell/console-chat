@@ -13,7 +13,7 @@ public class RequestBuilder {
 
     public static final String MESSAGE_KEY = "message";
 
-    public static final String ALREDY_REGISTERED = "Already registered";
+    public static final String ALREADY_REGISTERED = "Already registered";
     public static final String JUST_REGISTERED = "Registered";
     public static final String LOOKING_FOR_AGENT = "Looking for agent";
     public static final String CONNECTED = "Connected to agent";
@@ -24,7 +24,7 @@ public class RequestBuilder {
     }
 
     public static Request alreadyRegistered(){
-        return buildRequest(MESSAGE_KEY, ALREDY_REGISTERED);
+        return buildRequest(MESSAGE_KEY, ALREADY_REGISTERED);
     }
 
     public static Request justRegistered(){

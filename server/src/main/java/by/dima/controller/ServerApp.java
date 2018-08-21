@@ -13,6 +13,7 @@ public class ServerApp {
     }
 
     public static final String EXIT_COMMAND = "q";
+    public static final int DEFAULT_PORT = 9999;
 
     public ServerApp() {
         input = UserInput.console();
@@ -22,7 +23,7 @@ public class ServerApp {
 
     public void run(){
         try {
-            Server server = new Server(new ServerSocket(9999), true);
+            Server server = new Server(new ServerSocket(DEFAULT_PORT), true);
             new ServerHandler().handle(server);
 
             String userInput;

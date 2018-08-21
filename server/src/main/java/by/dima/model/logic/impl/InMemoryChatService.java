@@ -19,6 +19,10 @@ public class InMemoryChatService implements ChatService {
         chats = new HashMap<>();
     }
 
+    public InMemoryChatService(Map<User, User> chats) {
+        this.chats = chats;
+    }
+
     @Override
     public void startChat(User client, User agent) {
         chats.put(client, agent);
