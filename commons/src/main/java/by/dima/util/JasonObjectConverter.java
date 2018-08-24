@@ -2,9 +2,11 @@ package by.dima.util;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
+@Component
 public class JasonObjectConverter implements ObjectConverter {
 
     private ObjectMapper mapper;
