@@ -1,7 +1,7 @@
 package by.dima.model.logic;
 
 import by.dima.model.entity.Message;
-import by.dima.model.entity.Request;
+import by.dima.model.entity.Response;
 import by.dima.model.entity.SystemUserHolder;
 import by.dima.util.JasonObjectConverter;
 import by.dima.util.ObjectConverter;
@@ -19,27 +19,27 @@ public class RequestBuilder {
     public static final String CONNECTED = "Connected to agent";
     public static final String CLIENT_LEFT = "Client left";
 
-    private static Request buildRequest(String command, String data){
-        return new Request(command, converter.write(new Message(data, new Date(), SystemUserHolder.SYSTEM_USER)));
+    private static Response buildRequest(String command, String data){
+        return new Response(command, converter.write(new Message(data, new Date(), SystemUserHolder.SYSTEM_USER)));
     }
 
-    public static Request alreadyRegistered(){
+    public static Response alreadyRegistered(){
         return buildRequest(MESSAGE_KEY, ALREADY_REGISTERED);
     }
 
-    public static Request justRegistered(){
+    public static Response justRegistered(){
         return buildRequest(MESSAGE_KEY, JUST_REGISTERED);
     }
 
-    public static Request lookingForAgent(){
+    public static Response lookingForAgent(){
         return buildRequest(MESSAGE_KEY, LOOKING_FOR_AGENT);
     }
 
-    public static Request connected(){
+    public static Response connected(){
         return buildRequest(MESSAGE_KEY, CONNECTED);
     }
 
-    public static Request clientExited(){
+    public static Response clientExited(){
         return buildRequest(MESSAGE_KEY, CLIENT_LEFT);
     }
 }

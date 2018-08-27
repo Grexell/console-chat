@@ -1,7 +1,7 @@
 package by.dima.model.logic;
 
 import by.dima.model.entity.Message;
-import by.dima.model.entity.Request;
+import by.dima.model.entity.Response;
 import by.dima.util.JasonObjectConverter;
 import by.dima.util.ObjectConverter;
 import by.dima.util.UserHolder;
@@ -35,22 +35,22 @@ public class CommandPreprocessor implements RequestPreprocessor {
     @Override
     public String process(String data) {
         String result;
-        Request request = new Request();
+        Response response = new Response();
         if (data.startsWith(commandKeyStart)) {
             if (data.indexOf(commandKeyEnd) >= 0) {
-                request.setCommand(data.substring(data.indexOf(commandKeyStart) + 1, data.indexOf(commandKeyEnd)));
-                request.setData(DataPreprocessorBuilder.build(request.getCommand()).process(data.substring(data.indexOf(commandKeyEnd) + 1)));
+                response.setCommand(data.substring(data.indexOf(commandKeyStart) + 1, data.indexOf(commandKeyEnd)));
+                response.setData(DataPreprocessorBuilder.build(response.getCommand()).process(data.substring(data.indexOf(commandKeyEnd) + 1)));
             } else {
-                request.setCommand(data.substring(data.indexOf(commandKeyStart) + 1));
-                request.setData(DataPreprocessorBuilder.build(request.getCommand()).process(""));
+                response.setCommand(data.substring(data.indexOf(commandKeyStart) + 1));
+                response.setData(DataPreprocessorBuilder.build(response.getCommand()).process(""));
             }
 
         } else {
-            request.setCommand(messageCommand);
-            request.setData(requestObjConverter.write(new Message(data, new Date(), UserHolder.getInstance().getCurrentUser())));
+            response.setCommand(messageCommand);
+            response.setData(requestObjConverter.write(new Message(data, new Date(), UserHolder.getInstance().getCurrentUser())));
         }
 
-        result = requestObjConverter.write(request);
+        result = requestObjConverter.write(response);
 
         return result;
     }

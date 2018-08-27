@@ -1,6 +1,6 @@
 package by.dima.model.logic;
 
-import by.dima.model.entity.Request;
+import by.dima.model.entity.Response;
 import by.dima.model.entity.Role;
 import by.dima.model.entity.User;
 import by.dima.util.JasonObjectConverter;
@@ -17,6 +17,6 @@ public class CommandPreprocessorTest {
 
         ObjectConverter converter = new JasonObjectConverter();
 
-        assertEquals(preprocessor.process("/register client client"), converter.write(new Request("register", converter.write(new User("client", Role.CLIENT)))));
+        assertEquals(preprocessor.process("/register client client"), converter.write(new Response("register", converter.write(new User("client", Role.CLIENT)))));
     }
 }

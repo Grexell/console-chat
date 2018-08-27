@@ -1,15 +1,14 @@
 package by.dima.util;
 
-import by.dima.model.entity.Request;
+import by.dima.model.entity.Response;
 import org.hamcrest.core.StringContains;
-import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
 
 public class JasonObjectConverterTest {
 
-    private Request obj = new Request("test command", "test data");
+    private Response obj = new Response("test command", "test data");
 
     @Test
     public void write() {
@@ -24,8 +23,8 @@ public class JasonObjectConverterTest {
                 "\"command\": \"" + obj.getCommand() + "\"," +
                 "\"data\": \"" + obj.getData() + "\"" +
                 "}";
-        Request request = new JasonObjectConverter().read(data, Request.class);
-        assertEquals(request.getCommand(), obj.getCommand());
-        assertEquals(request.getData(), obj.getData());
+        Response response = new JasonObjectConverter().read(data, Response.class);
+        assertEquals(response.getCommand(), obj.getCommand());
+        assertEquals(response.getData(), obj.getData());
     }
 }

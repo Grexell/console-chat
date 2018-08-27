@@ -22,75 +22,77 @@ public class ChatController {
 
     private UserRepository userRepository;
     private AgentRepository agentRepository;
-    private MessageService messageService;
+    private MessageRepository messageRepository;
     private ChatRepository chatRepository;
     private UserQueueService userQueueService;
     @Autowired
     private ObjectConverter converter;
 
     @Autowired
-    public ChatController(UserRepository userRepository, AgentRepository agentRepository, MessageService messageService, ChatRepository chatRepository, UserQueueService userQueueService) {
+    public ChatController(UserRepository userRepository, AgentRepository agentRepository, MessageRepository messageRepository, ChatRepository chatRepository, UserQueueService userQueueService) {
         this.userRepository = userRepository;
         this.agentRepository = agentRepository;
-        this.messageService = messageService;
+        this.messageRepository = messageRepository;
         this.chatRepository = chatRepository;
         this.userQueueService = userQueueService;
     }
 
     @RequestMapping("/register")
-    public ResponseEntity<Request> register(@RequestBody User user, HttpServletRequest request){
-        Request result;
+    public ResponseEntity<Response> register(@RequestBody User user, HttpServletRequest request){
+        Response result;
         if (user != null) {
-            user.setId(request.getRemoteAddr() + user.getUsername());
+            user.setId("" + request.getRemoteAddr().hashCode() + user.getUsername().hashCode());
 
             if (!userRepository.isRegistered(user)){
                 userRepository.add(user);
-                messageService.sendMessage(user, MessageBuilder.justRegistered());
+                messageRepository.sendMessage(user, MessageBuilder.justRegistered());
                 if (Role.AGENT == user.getRole()) {
                     if (userQueueService.hasUser()) {
                         chatRepository.startChat(userQueueService.get(), user);
 
-                        messageService.sendMessage(user, MessageBuilder.connected());
+                        messageRepository.sendMessage(user, MessageBuilder.connected());
                     } else {
                         agentRepository.addAgent(user);
                     }
                 } else {
                     if (agentRepository.hasAgent()) {
-                        messageService.sendMessage(user, MessageBuilder.lookingForAgent());
+                        messageRepository.sendMessage(user, MessageBuilder.lookingForAgent());
 
                         chatRepository.startChat(user, agentRepository.getAgent());
                     } else {
-                        messageService.sendMessage(user, MessageBuilder.sendingToQueue());
+                        messageRepository.sendMessage(user, MessageBuilder.sendingToQueue());
 
                         userQueueService.add(user);
                     }
                 }
             } else {
-                messageService.sendMessage(user, MessageBuilder.alreadyRegistered());
+                messageRepository.sendMessage(user, MessageBuilder.alreadyRegistered());
             }
 
-            result = new Request("registered", user.getId());
+            result = new Response("registered", user.getId());
         } else {
-            result = new Request();
+            result = new Response();
         }
 
         return new ResponseEntity<>(result, HttpStatus.CREATED);
     }
 
     @RequestMapping("/{userToken}/exit")
-    public ResponseEntity<Request> exit(@PathVariable String userToken){
+    public ResponseEntity<Response> exit(@PathVariable String userToken){
         User user = userRepository.getById(userToken);
-        Request result;
+        Response result;
         if (user != null) {
             if (Role.CLIENT == user.getRole()) {
-                chatRepository.endChat(user, chatRepository.chatedAgent(user));
+                if (chatRepository.isChated(user)) {
+                    chatRepository.endChat(user, chatRepository.chatedAgent(user));
+                }
                 userRepository.remove(user);
-                result = new Request("message", converter.write(new Message("Exited", new Date(), SystemUserHolder.SYSTEM_USER)));
+                result = new Response("message", converter.write(new Message("Exited", new Date(), SystemUserHolder.SYSTEM_USER)));
             } else if (!chatRepository.isChated(user)){
                 agentRepository.removeAgent(user);
-                result = new Request("message", converter.write(new Message("Exited", new Date(), SystemUserHolder.SYSTEM_USER)));
+                result = new Response("message", converter.write(new Message("Exited", new Date(), SystemUserHolder.SYSTEM_USER)));
             } else {
-                result = new Request("message", converter.write(new Message("End all chats before", new Date(), SystemUserHolder.SYSTEM_USER)));
+                result = new Response("message", converter.write(new Message("End all chats before", new Date(), SystemUserHolder.SYSTEM_USER)));
             }
 
             return new ResponseEntity<>(result, HttpStatus.OK);
@@ -99,25 +101,25 @@ public class ChatController {
     }
 
     @RequestMapping("/{userToken}/leave")
-    public ResponseEntity<Request> leave(@PathVariable String userToken){
+    public ResponseEntity<Response> leave(@PathVariable String userToken){
         User user = userRepository.getById(userToken);
-        Request result;
+        Response result;
         if (user != null) {
             if (Role.CLIENT == user.getRole()) {
                 chatRepository.endChat(user, chatRepository.chatedAgent(user));
-                result = new Request("message", converter.write(new Message("Exited", new Date(), SystemUserHolder.SYSTEM_USER)));
+                result = new Response("message", converter.write(new Message("Exited", new Date(), SystemUserHolder.SYSTEM_USER)));
 
                 if (agentRepository.hasAgent()) {
-                    messageService.sendMessage(user, MessageBuilder.lookingForAgent());
+                    messageRepository.sendMessage(user, MessageBuilder.lookingForAgent());
 
                     chatRepository.startChat(user, agentRepository.getAgent());
                 } else {
-                    messageService.sendMessage(user, MessageBuilder.sendingToQueue());
+                    messageRepository.sendMessage(user, MessageBuilder.sendingToQueue());
 
                     userQueueService.add(user);
                 }
             } else {
-                result = new Request("message", converter.write(new Message("End all chats before", new Date(), SystemUserHolder.SYSTEM_USER)));
+                result = new Response("message", converter.write(new Message("End all chats before", new Date(), SystemUserHolder.SYSTEM_USER)));
             }
 
             return new ResponseEntity<>(result, HttpStatus.OK);
@@ -126,7 +128,7 @@ public class ChatController {
     }
 
     @RequestMapping("/{userToken}/send")
-    public ResponseEntity<Request> sendMessage(@PathVariable String userToken, @RequestBody Message message){
+    public ResponseEntity<Response> sendMessage(@PathVariable String userToken, @RequestBody Message message){
         User user = userRepository.getById(userToken);
         if (userRepository.isRegistered(user)) {
             User distUser;
@@ -136,9 +138,9 @@ public class ChatController {
             } else {
                 distUser = chatRepository.chatedAgent(user);
             }
-            messageService.sendMessage(distUser, message);
+            messageRepository.sendMessage(distUser, message);
         }
-        return null;
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @RequestMapping("/{userToken}/messages")
@@ -146,8 +148,8 @@ public class ChatController {
         List<Message> messages = new ArrayList<>();
         User user = userRepository.getById(userToken);
 
-        while(messageService.hasMessage(user)) {
-            messages.add(messageService.getMessage(user));
+        while(messageRepository.hasMessage(user)) {
+            messages.add(messageRepository.getMessage(user));
         }
 
         return new ResponseEntity(messages, HttpStatus.OK);

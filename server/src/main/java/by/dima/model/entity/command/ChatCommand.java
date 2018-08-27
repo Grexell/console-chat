@@ -1,7 +1,7 @@
 package by.dima.model.entity.command;
 
 import by.dima.model.entity.Message;
-import by.dima.model.entity.Request;
+import by.dima.model.entity.Response;
 import by.dima.model.entity.Role;
 import by.dima.model.entity.User;
 import by.dima.model.logic.ChatService;
@@ -34,7 +34,7 @@ public class ChatCommand implements Command{
             } else {
                 distUser = chatService.chatedAgent(user);
             }
-            userService.get(distUser).send(converter.write(new Request("message",data)));
+            userService.get(distUser).send(converter.write(new Response("message",data)));
         }
     }
 }

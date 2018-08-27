@@ -39,6 +39,12 @@ function messagesRender(messages, clear) {
     }
 }
 
+function chatDestroy(){
+    document.querySelector(".message-history").remove();
+    document.querySelector(".elements").remove();
+    document.querySelector(".login").style.visibility = "visible";
+}
+
 function chatRender() {
     document.body.innerHTML += "<div class=\"message-history\">\n" +
         "    </div>\n" +
@@ -62,6 +68,7 @@ function chatRender() {
             body: JSON.stringify(currentUser)
         }, function (response) {
         });
+        chatDestroy();
     };
     document.querySelector(".chat-leave").onclick = function () {
         networkWorker.getData('/' + currentUser.id + '/leave', {

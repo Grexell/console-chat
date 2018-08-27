@@ -1,22 +1,19 @@
 package by.dima.model.logic;
 
-import by.dima.model.entity.Request;
+import by.dima.model.entity.Response;
 import by.dima.model.entity.Role;
 import by.dima.model.entity.User;
 import by.dima.util.JasonObjectConverter;
 import by.dima.util.ObjectConverter;
 import org.junit.Test;
-import org.mockito.Mockito;
 
-import javax.xml.soap.SOAPConnection;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 
-import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
-public class RequestControllerTest {
+public class ResponseControllerTest {
 
     private ObjectConverter converter = new JasonObjectConverter();
 
@@ -28,7 +25,7 @@ public class RequestControllerTest {
         when(socket.getOutputStream()).thenReturn(stream);
 
         MessageReceiver receiver = mock(MessageReceiver.class);
-        when(receiver.receive()).thenReturn(converter.write(new Request("register", converter.write(new User("test", Role.CLIENT)))));
+        when(receiver.receive()).thenReturn(converter.write(new Response("register", converter.write(new User("test", Role.CLIENT)))));
 
         new Thread(new RequestController(socket, receiver, converter)).start();
         Thread.sleep(1000);

@@ -2,7 +2,8 @@ package by.dima.model.logic.impl;
 
 import by.dima.model.entity.Message;
 import by.dima.model.entity.User;
-import by.dima.model.logic.MessageService;
+import by.dima.model.logic.MessageRepository;
+import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -10,15 +11,15 @@ import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
-@Service
-public class InMemoryMessageService implements MessageService {
+@Repository
+public class InMemoryMessageRepository implements MessageRepository {
     private Map<User, BlockingQueue<Message>> messages;
 
-    public InMemoryMessageService() {
+    public InMemoryMessageRepository() {
         messages = new HashMap<>();
     }
 
-    public InMemoryMessageService(Map<User, BlockingQueue<Message>> messages) {
+    public InMemoryMessageRepository(Map<User, BlockingQueue<Message>> messages) {
         this.messages = messages;
     }
 

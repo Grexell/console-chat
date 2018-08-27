@@ -12,7 +12,7 @@
         <module>client</module>
         <module>server</module>
         <module>commons</module>
-        <module>ws-server</module>
+        <module>http-server</module>
     </modules>
 
     <dependencies>

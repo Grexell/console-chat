@@ -1,7 +1,6 @@
 package by.dima.model.logic;
 
 import by.dima.model.entity.Message;
-import by.dima.model.entity.Request;
 import by.dima.model.entity.SystemUserHolder;
 import by.dima.util.JasonObjectConverter;
 import by.dima.util.ObjectConverter;

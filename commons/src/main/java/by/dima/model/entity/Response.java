@@ -2,15 +2,15 @@ package by.dima.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class Request {
+public class Response {
     private String command;
     @JsonProperty(value="data")
     private String data;
 
-    public Request() {
+    public Response() {
     }
 
-    public Request(String command, String data) {
+    public Response(String command, String data) {
         this.command = command;
         this.data = data;
     }

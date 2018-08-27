@@ -1,7 +1,7 @@
 package by.dima.model.logic;
 
 import by.dima.model.entity.Message;
-import by.dima.model.entity.Request;
+import by.dima.model.entity.Response;
 import by.dima.model.logic.impl.StreamMessageReceiver;
 import by.dima.util.*;
 
@@ -33,8 +33,8 @@ public class ResponseReceiver implements Runnable {
         while (working){
             String data = messageReceiver.receive();
             if (data != null) {
-                Request request = messageConverter.read(data, Request.class);
-                Message message = messageConverter.read(request.getData(), Message.class);
+                Response response = messageConverter.read(data, Response.class);
+                Message message = messageConverter.read(response.getData(), Message.class);
                 userOutput.print(formatter.format(message));
             }
         }

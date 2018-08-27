@@ -1,6 +1,6 @@
 package by.dima.model.logic;
 
-import by.dima.model.entity.Request;
+import by.dima.model.entity.Response;
 import by.dima.model.entity.command.Command;
 import by.dima.util.ObjectConverter;
 import java.net.Socket;
@@ -21,9 +21,9 @@ public class RequestController implements Runnable {
         while (socket.isConnected()) {
             String msg = receiver.receive();
             if (msg != null) {
-                Request request = requestConverter.read(msg, Request.class);
-                Command command = CommandBuilder.getCommand(request.getCommand());
-                command.execute(socket, request.getData());
+                Response response = requestConverter.read(msg, Response.class);
+                Command command = CommandBuilder.getCommand(response.getCommand());
+                command.execute(socket, response.getData());
             }
         }
     }
