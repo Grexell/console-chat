@@ -1,47 +1,50 @@
 package by.dima.controller;
 
-import by.dima.model.logic.MessageSender;
-import by.dima.model.logic.impl.StreamMessageSender;
-import by.dima.model.entity.Client;
 import by.dima.model.logic.*;
-import by.dima.util.ConsoleUserOutput;
+import by.dima.model.logic.preprocessor.DataPreprocessorBuilder;
+import by.dima.model.logic.request.RequestHandlerBuilder;
+import by.dima.model.logic.preprocessor.DataPreprocessor;
+import by.dima.model.logic.preprocessor.impl.MarkerDataPreprocessor;
 import by.dima.util.UserInput;
-
-import java.io.IOException;
 
 public class ClientApp {
     public static void main(String[] args) {
-        try {
-            new ClientApp().run();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        new ClientApp().run();
     }
 
     public static final String EXIT_COMMAND = "/exit";
+    public static final String DATA_DELIMITER = " ";
 
-    public ClientApp() throws IOException {
+    public ClientApp() {
         input = UserInput.console();
-        client = new Client();
-        messageSender = new StreamMessageSender(client.getSocket().getOutputStream());
-        requestPreprocessor = new CommandPreprocessor();
-        receiver = new ResponseReceiver(client.getSocket().getInputStream(), new ConsoleUserOutput());
+        receiver = new ResponseReceiver();
+
+        commandParser = new MarkerDataPreprocessor();
+        dataPreprocessor = new MarkerDataPreprocessor(DATA_DELIMITER, null);
+
         new Thread(receiver).start();
     }
 
-    private Client client;
     private UserInput input;
     private ResponseReceiver receiver;
-    private MessageSender messageSender;
-    private RequestPreprocessor requestPreprocessor;
+
+    private DataPreprocessor commandParser;
+    private DataPreprocessor dataPreprocessor;
+
 
     public void run() {
         String userInput;
         do {
             try{
                 userInput = input.getLine();
-                String userRequest = requestPreprocessor.process(userInput);
-                messageSender.send(userRequest);
+
+                String command = commandParser.parse(userInput);
+                command = commandParser.parse(userInput).isEmpty()? RequestHandlerBuilder.SEND_MESSAGE_COMMAND: command;
+                String data = dataPreprocessor.parse(userInput);
+
+                data = DataPreprocessorBuilder.build(command).parse(data);
+
+                RequestHandlerBuilder.build(command).handle(data);
             } catch (Exception ex) {
                 System.out.println(ex.getMessage());
                 userInput = new String();
@@ -49,11 +52,5 @@ public class ClientApp {
         } while (!EXIT_COMMAND.equalsIgnoreCase(userInput));
 
         receiver.setWorking(false);
-
-        try {
-            client.getSocket().close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 }

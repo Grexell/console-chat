@@ -64,8 +64,7 @@ function chatRender() {
             headers: {
                 Accept: 'application/json',
                 'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(currentUser)
+            }
         }, function (response) {
         });
         chatDestroy();

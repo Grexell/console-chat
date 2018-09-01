@@ -1,16 +1,13 @@
-package by.dima.model.logic.impl;
+package by.dima.model.logic.repository.impl;
 
 import by.dima.model.entity.User;
-import by.dima.model.logic.MessageSender;
-import by.dima.model.logic.UserRepository;
+import by.dima.model.logic.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArraySet;
 
 @Repository
 public class InMemoryUserRepository implements UserRepository {

@@ -2,6 +2,7 @@ package by.dima.controller;
 
 import by.dima.model.entity.*;
 import by.dima.model.logic.*;
+import by.dima.model.logic.repository.*;
 import by.dima.util.ObjectConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,22 +25,22 @@ public class ChatController {
     private AgentRepository agentRepository;
     private MessageRepository messageRepository;
     private ChatRepository chatRepository;
-    private UserQueueService userQueueService;
+    private UserQueueRepository userQueueRepository;
     @Autowired
     private ObjectConverter converter;
 
     @Autowired
-    public ChatController(UserRepository userRepository, AgentRepository agentRepository, MessageRepository messageRepository, ChatRepository chatRepository, UserQueueService userQueueService) {
+    public ChatController(UserRepository userRepository, AgentRepository agentRepository, MessageRepository messageRepository, ChatRepository chatRepository, UserQueueRepository userQueueRepository) {
         this.userRepository = userRepository;
         this.agentRepository = agentRepository;
         this.messageRepository = messageRepository;
         this.chatRepository = chatRepository;
-        this.userQueueService = userQueueService;
+        this.userQueueRepository = userQueueRepository;
     }
 
     @RequestMapping("/register")
-    public ResponseEntity<Response> register(@RequestBody User user, HttpServletRequest request){
-        Response result;
+    public ResponseEntity register(@RequestBody User user, HttpServletRequest request){
+        String result;
         if (user != null) {
             user.setId("" + request.getRemoteAddr().hashCode() + user.getUsername().hashCode());
 
@@ -47,8 +48,8 @@ public class ChatController {
                 userRepository.add(user);
                 messageRepository.sendMessage(user, MessageBuilder.justRegistered());
                 if (Role.AGENT == user.getRole()) {
-                    if (userQueueService.hasUser()) {
-                        chatRepository.startChat(userQueueService.get(), user);
+                    if (userQueueRepository.hasUser()) {
+                        chatRepository.startChat(userQueueRepository.get(), user);
 
                         messageRepository.sendMessage(user, MessageBuilder.connected());
                     } else {
@@ -62,16 +63,16 @@ public class ChatController {
                     } else {
                         messageRepository.sendMessage(user, MessageBuilder.sendingToQueue());
 
-                        userQueueService.add(user);
+                        userQueueRepository.add(user);
                     }
                 }
             } else {
                 messageRepository.sendMessage(user, MessageBuilder.alreadyRegistered());
             }
 
-            result = new Response("registered", user.getId());
+            result = user.getId();
         } else {
-            result = new Response();
+            result = new String();
         }
 
         return new ResponseEntity<>(result, HttpStatus.CREATED);
@@ -116,7 +117,7 @@ public class ChatController {
                 } else {
                     messageRepository.sendMessage(user, MessageBuilder.sendingToQueue());
 
-                    userQueueService.add(user);
+                    userQueueRepository.add(user);
                 }
             } else {
                 result = new Response("message", converter.write(new Message("End all chats before", new Date(), SystemUserHolder.SYSTEM_USER)));

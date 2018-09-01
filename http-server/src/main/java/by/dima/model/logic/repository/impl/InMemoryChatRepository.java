@@ -1,7 +1,7 @@
-package by.dima.model.logic.impl;
+package by.dima.model.logic.repository.impl;
 
 import by.dima.model.entity.User;
-import by.dima.model.logic.ChatRepository;
+import by.dima.model.logic.repository.ChatRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;

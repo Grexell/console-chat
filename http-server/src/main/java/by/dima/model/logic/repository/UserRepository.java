@@ -1,4 +1,4 @@
-package by.dima.model.logic;
+package by.dima.model.logic.repository;
 
 import by.dima.model.entity.User;
 import by.dima.model.logic.MessageSender;

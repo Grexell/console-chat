@@ -2,6 +2,7 @@ package by.dima.model.logic;
 
 import by.dima.model.entity.Role;
 import by.dima.model.entity.User;
+import by.dima.model.logic.preprocessor.impl.RegisterDataPreprocessor;
 import by.dima.util.JasonObjectConverter;
 import by.dima.util.ObjectConverter;
 import org.junit.Test;
@@ -14,6 +15,6 @@ public class RegisterDataPreprocessorTest {
     public void process() {
         ObjectConverter converter = new JasonObjectConverter();
         RegisterDataPreprocessor preprocessor = new RegisterDataPreprocessor(converter);
-        assertEquals(preprocessor.process("client client"), converter.write(new User("client", Role.CLIENT)));
+        assertEquals(preprocessor.parse("client client"), converter.write(new User("client", Role.CLIENT)));
     }
 }

@@ -1,11 +1,10 @@
-package by.dima.model.logic;
+package by.dima.model.logic.preprocessor.impl;
 
 import by.dima.model.entity.Role;
 import by.dima.model.entity.User;
+import by.dima.model.logic.preprocessor.DataPreprocessor;
 import by.dima.util.ObjectConverter;
 import by.dima.util.UserHolder;
-
-import java.util.InvalidPropertiesFormatException;
 
 public class RegisterDataPreprocessor implements DataPreprocessor {
     private ObjectConverter converter;
@@ -18,7 +17,7 @@ public class RegisterDataPreprocessor implements DataPreprocessor {
     }
 
     @Override
-    public String process(String data) {
+    public String parse(String data) {
         String[] dataArray = data.split(" ");
 
         User user;

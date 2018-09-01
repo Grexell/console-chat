@@ -1,7 +1,7 @@
-package by.dima.model.logic.impl;
+package by.dima.model.logic.repository.impl;
 
 import by.dima.model.entity.User;
-import by.dima.model.logic.AgentRepository;
+import by.dima.model.logic.repository.AgentRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.concurrent.BlockingQueue;

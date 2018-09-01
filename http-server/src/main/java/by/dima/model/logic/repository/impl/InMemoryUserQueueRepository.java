@@ -1,22 +1,22 @@
-package by.dima.model.logic.impl;
+package by.dima.model.logic.repository.impl;
 
 import by.dima.model.entity.User;
-import by.dima.model.logic.UserQueueService;
+import by.dima.model.logic.repository.UserQueueRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 @Service
-public class InMemoryUserQueueService implements UserQueueService  {
+public class InMemoryUserQueueRepository implements UserQueueRepository {
 
     private BlockingQueue<User> users;
 
-    public InMemoryUserQueueService() {
+    public InMemoryUserQueueRepository() {
         users = new LinkedBlockingQueue<>();
     }
 
-    public InMemoryUserQueueService(BlockingQueue<User> users) {
+    public InMemoryUserQueueRepository(BlockingQueue<User> users) {
         this.users = users;
     }
 

@@ -1,10 +1,9 @@
-package by.dima.model.logic.impl;
+package by.dima.model.logic.repository.impl;
 
 import by.dima.model.entity.Message;
 import by.dima.model.entity.User;
-import by.dima.model.logic.MessageRepository;
+import by.dima.model.logic.repository.MessageRepository;
 import org.springframework.stereotype.Repository;
-import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.Map;
