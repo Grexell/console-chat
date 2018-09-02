@@ -3,6 +3,7 @@ package by.dima.controller;
 import by.dima.model.entity.*;
 import by.dima.model.logic.*;
 import by.dima.model.logic.repository.*;
+import by.dima.model.logic.service.ChatService;
 import by.dima.util.ObjectConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,21 +22,14 @@ import java.util.List;
 @RequestMapping("/api")
 public class ChatController {
 
-    private UserRepository userRepository;
-    private AgentRepository agentRepository;
-    private MessageRepository messageRepository;
-    private ChatRepository chatRepository;
-    private UserQueueRepository userQueueRepository;
+    private ChatService chatService;
+
     @Autowired
     private ObjectConverter converter;
 
     @Autowired
-    public ChatController(UserRepository userRepository, AgentRepository agentRepository, MessageRepository messageRepository, ChatRepository chatRepository, UserQueueRepository userQueueRepository) {
-        this.userRepository = userRepository;
-        this.agentRepository = agentRepository;
-        this.messageRepository = messageRepository;
-        this.chatRepository = chatRepository;
-        this.userQueueRepository = userQueueRepository;
+    public ChatController(ChatService chatService) {
+        this.chatService = chatService;
     }
 
     @RequestMapping("/register")
@@ -44,31 +38,8 @@ public class ChatController {
         if (user != null) {
             user.setId("" + request.getRemoteAddr().hashCode() + user.getUsername().hashCode());
 
-            if (!userRepository.isRegistered(user)){
-                userRepository.add(user);
-                messageRepository.sendMessage(user, MessageBuilder.justRegistered());
-                if (Role.AGENT == user.getRole()) {
-                    if (userQueueRepository.hasUser()) {
-                        chatRepository.startChat(userQueueRepository.get(), user);
-
-                        messageRepository.sendMessage(user, MessageBuilder.connected());
-                    } else {
-                        agentRepository.addAgent(user);
-                    }
-                } else {
-                    if (agentRepository.hasAgent()) {
-                        messageRepository.sendMessage(user, MessageBuilder.lookingForAgent());
-
-                        chatRepository.startChat(user, agentRepository.getAgent());
-                    } else {
-                        messageRepository.sendMessage(user, MessageBuilder.sendingToQueue());
-
-                        userQueueRepository.add(user);
-                    }
-                }
-            } else {
-                messageRepository.sendMessage(user, MessageBuilder.alreadyRegistered());
-            }
+            chatService.register(user);
+            chatService.engageChat(user);
 
             result = user.getId();
         } else {
@@ -80,79 +51,44 @@ public class ChatController {
 
     @RequestMapping("/{userToken}/exit")
     public ResponseEntity<Response> exit(@PathVariable String userToken){
-        User user = userRepository.getById(userToken);
-        Response result;
+        User user = chatService.getUserById(userToken);
         if (user != null) {
-            if (Role.CLIENT == user.getRole()) {
-                if (chatRepository.isChated(user)) {
-                    chatRepository.endChat(user, chatRepository.chatedAgent(user));
-                }
-                userRepository.remove(user);
-                result = new Response("message", converter.write(new Message("Exited", new Date(), SystemUserHolder.SYSTEM_USER)));
-            } else if (!chatRepository.isChated(user)){
-                agentRepository.removeAgent(user);
-                result = new Response("message", converter.write(new Message("Exited", new Date(), SystemUserHolder.SYSTEM_USER)));
-            } else {
-                result = new Response("message", converter.write(new Message("End all chats before", new Date(), SystemUserHolder.SYSTEM_USER)));
-            }
 
-            return new ResponseEntity<>(result, HttpStatus.OK);
+            chatService.endChat(user);
+            chatService.delete(user);
+
         }
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
     @RequestMapping("/{userToken}/leave")
     public ResponseEntity<Response> leave(@PathVariable String userToken){
-        User user = userRepository.getById(userToken);
-        Response result;
-        if (user != null) {
-            if (Role.CLIENT == user.getRole()) {
-                chatRepository.endChat(user, chatRepository.chatedAgent(user));
-                result = new Response("message", converter.write(new Message("Exited", new Date(), SystemUserHolder.SYSTEM_USER)));
+        User user = chatService.getUserById(userToken);
+        if (user != null && user.getRole() == Role.CLIENT) {
 
-                if (agentRepository.hasAgent()) {
-                    messageRepository.sendMessage(user, MessageBuilder.lookingForAgent());
-
-                    chatRepository.startChat(user, agentRepository.getAgent());
-                } else {
-                    messageRepository.sendMessage(user, MessageBuilder.sendingToQueue());
-
-                    userQueueRepository.add(user);
-                }
-            } else {
-                result = new Response("message", converter.write(new Message("End all chats before", new Date(), SystemUserHolder.SYSTEM_USER)));
-            }
-
-            return new ResponseEntity<>(result, HttpStatus.OK);
+            chatService.endChat(user);
+            chatService.engageChat(user);
+            return new ResponseEntity<>(HttpStatus.OK);
         }
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
     @RequestMapping("/{userToken}/send")
-    public ResponseEntity<Response> sendMessage(@PathVariable String userToken, @RequestBody Message message){
-        User user = userRepository.getById(userToken);
-        if (userRepository.isRegistered(user)) {
-            User distUser;
+    public ResponseEntity sendMessage(@PathVariable String userToken, @RequestBody Message message){
+        User user = chatService.getUserById(userToken);
 
-            if (Role.AGENT == user.getRole()) {
-                distUser = chatRepository.chatedUser(user);
-            } else {
-                distUser = chatRepository.chatedAgent(user);
-            }
-            messageRepository.sendMessage(distUser, message);
+        if (user != null) {
+
+            chatService.sendMessage(user, message);
         }
+
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @RequestMapping("/{userToken}/messages")
     public ResponseEntity getNewMessages(@PathVariable String userToken){
-        List<Message> messages = new ArrayList<>();
-        User user = userRepository.getById(userToken);
+        User user = chatService.getUserById(userToken);
 
-        while(messageRepository.hasMessage(user)) {
-            messages.add(messageRepository.getMessage(user));
-        }
-
-        return new ResponseEntity(messages, HttpStatus.OK);
+        return new ResponseEntity(chatService.getNewMessages(user), HttpStatus.OK);
     }
 }

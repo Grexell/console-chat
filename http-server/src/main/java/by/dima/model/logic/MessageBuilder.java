@@ -15,9 +15,10 @@ public class MessageBuilder {
     public static final String ALREADY_REGISTERED = "Already registered";
     public static final String JUST_REGISTERED = "Registered";
     public static final String LOOKING_FOR_AGENT = "Looking for agent";
-    public static final String CONNECTED = "Connected to agent";
+    public static final String CONNECTED_TO_CLIENT = "Connected to client";
+    public static final String CONNECTED_TO_AGENT = "Connected to agent";
     public static final String CLIENT_LEFT = "Client left";
-    public static final String SENDING_TO_QUEUE = "You are ";
+    public static final String SENDING_TO_QUEUE = "You are in queue";
 
     private static Message buildRequest(String data){
         return new Message(data, new Date(), SystemUserHolder.SYSTEM_USER);
@@ -35,8 +36,12 @@ public class MessageBuilder {
         return buildRequest(LOOKING_FOR_AGENT);
     }
 
-    public static Message connected(){
-        return buildRequest(CONNECTED);
+    public static Message connectedToAgent(){
+        return buildRequest(CONNECTED_TO_AGENT);
+    }
+
+    public static Message connectedToClient(){
+        return buildRequest(CONNECTED_TO_CLIENT);
     }
 
     public static Message clientExited(){

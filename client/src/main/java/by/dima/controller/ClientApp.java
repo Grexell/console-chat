@@ -2,6 +2,7 @@ package by.dima.controller;
 
 import by.dima.model.logic.*;
 import by.dima.model.logic.preprocessor.DataPreprocessorBuilder;
+import by.dima.model.logic.preprocessor.impl.CommandDataPreprocessor;
 import by.dima.model.logic.request.RequestHandlerBuilder;
 import by.dima.model.logic.preprocessor.DataPreprocessor;
 import by.dima.model.logic.preprocessor.impl.MarkerDataPreprocessor;
@@ -19,8 +20,8 @@ public class ClientApp {
         input = UserInput.console();
         receiver = new ResponseReceiver();
 
-        commandParser = new MarkerDataPreprocessor();
-        dataPreprocessor = new MarkerDataPreprocessor(DATA_DELIMITER, null);
+        commandParser = new CommandDataPreprocessor();
+        dataPreprocessor = new MarkerDataPreprocessor(DATA_DELIMITER, null, true);
 
         new Thread(receiver).start();
     }

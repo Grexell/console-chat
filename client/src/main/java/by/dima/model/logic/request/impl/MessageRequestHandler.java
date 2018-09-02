@@ -30,17 +30,19 @@ public class MessageRequestHandler extends AbstractRestTemplateHandler {
     @Override
     public void handle(String data) {
         List<Message> messages;
-        if (UserHolder.getInstance().getCurrentUser() != null &&
-                UserHolder.getInstance().getCurrentUser().getId() != null &&
-                UserHolder.getInstance().getCurrentUser().getId().length() > 0) {
-            messages = getTemplate().exchange(getUrl(),
-                    HttpMethod.GET,
-                    new HttpEntity<>(getHeaders()),
-                    new ParameterizedTypeReference<List<Message>>() {
-                    }).getBody();
+        synchronized (UserHolder.getInstance()) {
+            if (UserHolder.getInstance().getCurrentUser() != null &&
+                    UserHolder.getInstance().getCurrentUser().getId() != null &&
+                    UserHolder.getInstance().getCurrentUser().getId().length() > 0) {
+                messages = getTemplate().exchange(getUrl(),
+                        HttpMethod.GET,
+                        new HttpEntity<>(getHeaders()),
+                        new ParameterizedTypeReference<List<Message>>() {
+                        }).getBody();
 
-            for (Message message : messages) {
-                userOutput.print(formatter.format(message));
+                for (Message message : messages) {
+                    userOutput.print(formatter.format(message));
+                }
             }
         }
     }

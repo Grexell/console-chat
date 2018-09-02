@@ -26,12 +26,17 @@ public class InMemoryUserQueueRepository implements UserQueueRepository {
     }
 
     @Override
+    public void remove(User user) {
+        users.remove(user);
+    }
+
+    @Override
     public User get() {
         return users.poll();
     }
 
     @Override
     public boolean hasUser() {
-        return users.isEmpty();
+        return !users.isEmpty();
     }
 }

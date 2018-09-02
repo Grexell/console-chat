@@ -9,6 +9,7 @@ public class MarkerDataPreprocessor implements DataPreprocessor {
 
     private String marker;
     private String endMarker;
+    private boolean fullDefault;
 
     public MarkerDataPreprocessor() {
         this(DEFAULT_MARKER, DEFAULT_END_MARKER);
@@ -23,6 +24,12 @@ public class MarkerDataPreprocessor implements DataPreprocessor {
         this.endMarker = endMarker;
     }
 
+    public MarkerDataPreprocessor(String marker, String endMarker, boolean fullDefault) {
+        this.marker = marker;
+        this.endMarker = endMarker;
+        this.fullDefault = fullDefault;
+    }
+
     @Override
     public String parse(String data) {
         String result;
@@ -34,7 +41,7 @@ public class MarkerDataPreprocessor implements DataPreprocessor {
             }
 
         } else {
-            result = new String();
+            result = fullDefault ? data : new String();
         }
         return result;
     }
