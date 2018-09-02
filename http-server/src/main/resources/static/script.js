@@ -39,7 +39,7 @@ function messagesRender(messages, clear) {
     }
 }
 
-function chatDestroy(){
+function chatDestroy() {
     document.querySelector(".message-history").remove();
     document.querySelector(".elements").remove();
     document.querySelector(".login").style.visibility = "visible";
@@ -59,7 +59,7 @@ function chatRender() {
         "    </div>";
 
     document.querySelector(".chat-close").onclick = function () {
-        networkWorker.getData('/' + currentUser.id + '/exit', {
+        networkWorker.getData('/api/' + currentUser.id + '/exit', {
             method: 'POST',
             headers: {
                 Accept: 'application/json',
@@ -68,9 +68,10 @@ function chatRender() {
         }, function (response) {
         });
         chatDestroy();
+        clearInterval(messagesUpdate);
     };
     document.querySelector(".chat-leave").onclick = function () {
-        networkWorker.getData('/' + currentUser.id + '/leave', {
+        networkWorker.getData('/api/' + currentUser.id + '/leave', {
             method: 'POST',
             headers: {
                 Accept: 'application/json',
@@ -88,7 +89,7 @@ function messageSend() {
     var sendDate = new Date();
     var item = new HistoryItem(sendDate, currentUser, text.value);
 
-    networkWorker.getData('/' + currentUser.id + '/send', {
+    networkWorker.getData('/api/' + currentUser.id + '/send', {
         method: 'POST',
         headers: {
             Accept: 'application/json',
@@ -105,7 +106,7 @@ function messageSend() {
 }
 
 function messagesUpdate() {
-    networkWorker.getData('/' + currentUser.id + '/messages', {
+    networkWorker.getData('/api/' + currentUser.id + '/messages', {
         method: 'POST',
         headers: {
             Accept: 'application/json',
@@ -113,8 +114,8 @@ function messagesUpdate() {
         }
     }, function (response) {
         response.json().then(
-            function (json) {
-                messagesRender(json);
+            function (body) {
+                messagesRender(body);
             });
     });
 }
@@ -133,14 +134,14 @@ window.onload = function () {
                 },
                 body: JSON.stringify(currentUser)
             }, function (response) {
-                response.json().then(
-                    function (json) {
-                        currentUser.id = json.data;
+                response.text().then(
+                    function (data) {
+                        currentUser.id = data;
                     });
                 setInterval(messagesUpdate, 1000);
+                chatRender();
             }
         );
-        chatRender();
         event.preventDefault();
     };
 };
