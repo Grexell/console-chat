@@ -1,12 +1,17 @@
 package by.dima.model.entity;
 
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 
 public class Chat {
     private Date engagementStart;
     private User customer;
     private User agent;
+
+    public Chat(User customer, User agent) {
+        this(customer, agent, new LinkedList<>());
+    }
 
     public Chat(User customer, User agent, List<Message> messages) {
         this(new Date(), customer, agent, messages);

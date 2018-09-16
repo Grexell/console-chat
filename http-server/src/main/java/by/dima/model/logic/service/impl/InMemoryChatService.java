@@ -1,6 +1,8 @@
 package by.dima.model.logic.service.impl;
 
-import by.dima.model.entity.*;
+import by.dima.model.entity.Message;
+import by.dima.model.entity.Role;
+import by.dima.model.entity.User;
 import by.dima.model.logic.MessageBuilder;
 import by.dima.model.logic.repository.*;
 import by.dima.model.logic.service.ChatService;
@@ -95,12 +97,18 @@ public class InMemoryChatService implements ChatService {
             User distUser;
 
             if (Role.AGENT == sender.getRole()) {
-                distUser = chatRepository.chatedUser(sender);
+                distUser = chatRepository.chatedClient(sender);
             } else {
                 distUser = chatRepository.chatedAgent(sender);
             }
+            chatRepository.getChat(sender).getMessages().add(message);
             messageRepository.sendMessage(distUser, message);
         }
+    }
+
+    @Override
+    public void sendMessageTo(User dist, Message message) {
+        messageRepository.sendMessage(dist, message);
     }
 
     @Override

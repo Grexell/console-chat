@@ -11,6 +11,8 @@ public interface ChatService {
     void engageChat(User user);
     void endChat(User user);
     void sendMessage(User sender, Message message);
+
+    void sendMessageTo(User dist, Message message);
     List<Message> getNewMessages(User user);
     User getUserById(String id);
 }

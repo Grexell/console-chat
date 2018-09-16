@@ -1,9 +1,11 @@
 package by.dima.controller;
 
-import by.dima.model.entity.*;
-import by.dima.model.logic.*;
-import by.dima.model.logic.repository.*;
+import by.dima.model.entity.Message;
+import by.dima.model.entity.Response;
+import by.dima.model.entity.Role;
+import by.dima.model.entity.User;
 import by.dima.model.logic.service.ChatService;
+import by.dima.model.logic.service.SecurityService;
 import by.dima.util.ObjectConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -25,12 +27,15 @@ public class ChatController {
     private ObjectConverter converter;
 
     @Autowired
+    private SecurityService securityService;
+
+    @Autowired
     public ChatController(ChatService chatService) {
         this.chatService = chatService;
     }
 
     @RequestMapping("/register")
-    public ResponseEntity register(@RequestBody User user, HttpServletRequest request){
+    public ResponseEntity register(@RequestBody User user, HttpServletRequest request) {
         String result;
         if (user != null) {
             user.setId("" + request.getRemoteAddr().hashCode() + user.getUsername().hashCode());
@@ -38,7 +43,7 @@ public class ChatController {
             chatService.register(user);
             chatService.engageChat(user);
 
-            result = user.getId();
+            result = securityService.protect(user.getId());
         } else {
             result = new String();
         }
@@ -47,20 +52,24 @@ public class ChatController {
     }
 
     @RequestMapping("/{userToken}/exit")
-    public ResponseEntity<Response> exit(@PathVariable String userToken){
-        User user = chatService.getUserById(userToken);
+    public ResponseEntity<Response> exit(@PathVariable String userToken) {
+        String id = securityService.check(userToken);
+        User user = chatService.getUserById(id);
         if (user != null) {
 
             chatService.endChat(user);
             chatService.delete(user);
+            securityService.unprotect(userToken);
 
         }
+
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
     @RequestMapping("/{userToken}/leave")
-    public ResponseEntity<Response> leave(@PathVariable String userToken){
-        User user = chatService.getUserById(userToken);
+    public ResponseEntity<Response> leave(@PathVariable String userToken) {
+        String id = securityService.check(userToken);
+        User user = chatService.getUserById(id);
         if (user != null && user.getRole() == Role.CLIENT) {
 
             chatService.endChat(user);
@@ -71,8 +80,9 @@ public class ChatController {
     }
 
     @RequestMapping("/{userToken}/send")
-    public ResponseEntity sendMessage(@PathVariable String userToken, @RequestBody Message message){
-        User user = chatService.getUserById(userToken);
+    public ResponseEntity sendMessage(@PathVariable String userToken, @RequestBody Message message) {
+        String id = securityService.check(userToken);
+        User user = chatService.getUserById(id);
 
         if (user != null) {
 
@@ -82,9 +92,24 @@ public class ChatController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    @RequestMapping("/{userToken}/send/{userId}")
+    public ResponseEntity sendMessageTo(@PathVariable String userToken, @PathVariable String userId, @RequestBody Message message) {
+        String id = securityService.check(userToken);
+        User user = chatService.getUserById(id);
+
+        if (user != null) {
+            message.setUser(user);
+            User dist = chatService.getUserById(userId);
+            chatService.sendMessageTo(dist, message);
+        }
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
     @RequestMapping("/{userToken}/messages")
-    public ResponseEntity getNewMessages(@PathVariable String userToken){
-        User user = chatService.getUserById(userToken);
+    public ResponseEntity getNewMessages(@PathVariable String userToken) {
+        String id = securityService.check(userToken);
+        User user = chatService.getUserById(id);
 
         return new ResponseEntity(chatService.getNewMessages(user), HttpStatus.OK);
     }

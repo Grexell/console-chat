@@ -4,6 +4,8 @@ import by.dima.model.entity.User;
 import by.dima.model.logic.repository.UserQueueRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -38,5 +40,10 @@ public class InMemoryUserQueueRepository implements UserQueueRepository {
     @Override
     public boolean hasUser() {
         return !users.isEmpty();
+    }
+
+    @Override
+    public List<User> getAllUsers() {
+        return new LinkedList<>(users);
     }
 }

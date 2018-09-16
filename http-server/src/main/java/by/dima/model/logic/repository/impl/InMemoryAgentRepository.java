@@ -4,6 +4,8 @@ import by.dima.model.entity.User;
 import by.dima.model.logic.repository.AgentRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -43,6 +45,11 @@ public class InMemoryAgentRepository implements AgentRepository {
     @Override
     public boolean hasAgent() {
         return !userQueue.isEmpty();
+    }
+
+    @Override
+    public List<User> getAll() {
+        return new LinkedList<>(userQueue);
     }
 
     @Override

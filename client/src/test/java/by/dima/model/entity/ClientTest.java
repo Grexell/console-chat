@@ -2,11 +2,6 @@ package by.dima.model.entity;
 
 import org.junit.Test;
 
-import java.io.IOException;
-import java.net.Socket;
-
-import static org.junit.Assert.*;
-
 public class ClientTest {
 
     @Test
@@ -16,7 +11,7 @@ public class ClientTest {
     }
 
     @Test
-    public void setSocket() throws IOException {
+    public void setSocket() {
 //        Socket socket = new Socket();
 //        Client client = new Client(null);
 //        client.setSocket(socket);

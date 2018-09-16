@@ -42,6 +42,6 @@ public class InMemoryMessageRepository implements MessageRepository {
 
     @Override
     public boolean hasMessage(User user) {
-        return !messages.get(user).isEmpty();
+        return messages.containsKey(user) && !messages.get(user).isEmpty();
     }
 }

@@ -5,14 +5,14 @@ import org.junit.Test;
 
 import java.util.Date;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class MessageTest {
 
     Message message;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         message = new Message("test", new Date(), new User("client", Role.CLIENT));
     }
 

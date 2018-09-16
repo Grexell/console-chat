@@ -6,6 +6,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -45,5 +47,10 @@ public class InMemoryUserRepository implements UserRepository {
     @Override
     public boolean isRegistered(User user) {
         return users.containsKey(user.getId());
+    }
+
+    @Override
+    public List<User> getAllUsers() {
+        return new LinkedList<>(users.values());
     }
 }

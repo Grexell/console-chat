@@ -1,5 +1,6 @@
 package by.dima.model.logic.repository.impl;
 
+import by.dima.model.entity.Chat;
 import by.dima.model.entity.User;
 import by.dima.model.logic.repository.ChatRepository;
 import org.slf4j.Logger;
@@ -7,6 +8,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 @Repository
@@ -15,47 +18,66 @@ public class InMemoryChatRepository implements ChatRepository {
     private static final String CHAT_START_MESSAGE = "Chat started";
     private static final String CHAT_END_MESSAGE = "Chat ended";
 
-    private Map<User, User> chats;
+    private Map<User, Chat> clientChats;
+    private Map<String, Chat> chats;
 
     public InMemoryChatRepository() {
-        chats = new HashMap<>();
+        this(new HashMap<>(), new HashMap<>());
     }
 
-    public InMemoryChatRepository(Map<User, User> chats) {
+    public InMemoryChatRepository(Map<User, Chat> clientChats) {
+        this(clientChats, new HashMap<>());
+    }
+
+    public InMemoryChatRepository(Map<User, Chat> clientChats, Map<String, Chat> chats) {
+        this.clientChats = clientChats;
         this.chats = chats;
     }
 
     @Override
     public void startChat(User client, User agent) {
-        chats.put(client, agent);
+        Chat chat = new Chat(client, agent);
+        clientChats.put(client, chat);
+        clientChats.put(agent, chat);
+        chats.put(chat.getId(), chat);
         LOG.info(CHAT_START_MESSAGE);
     }
 
     @Override
     public void endChat(User client, User agent) {
-        chats.remove(client);
+        Chat deleteChat = clientChats.remove(client);
+        clientChats.remove(agent);
+        chats.remove(deleteChat.getId());
         LOG.info(CHAT_END_MESSAGE);
     }
 
     @Override
     public User chatedAgent(User client) {
-        return chats.get(client);
+        return clientChats.get(client).getAgent();
     }
 
     @Override
-    public User chatedUser(User agent) {
-        User client = null;
-        for (Map.Entry<User, User> chat: chats.entrySet()) {
-            if (chat.getValue().equals(agent)){
-                client = chat.getKey();
-                break;
-            }
-        }
-        return client;
+    public User chatedClient(User agent) {
+        return clientChats.get(agent).getCustomer();
     }
 
     @Override
     public boolean isChated(User user) {
-        return chats.containsKey(user) || chats.containsValue(user);
+        return clientChats.containsKey(user);
+    }
+
+    @Override
+    public Chat getChat(User user) {
+        return clientChats.get(user);
+    }
+
+    @Override
+    public Chat getById(String id) {
+        return chats.get(id);
+    }
+
+    @Override
+    public List<String> getAllOpenedChats() {
+        return new LinkedList<>(chats.keySet());
     }
 }
