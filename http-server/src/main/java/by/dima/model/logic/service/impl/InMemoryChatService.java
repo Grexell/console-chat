@@ -1,8 +1,9 @@
-package by.dima.model.logic.service;
+package by.dima.model.logic.service.impl;
 
 import by.dima.model.entity.*;
 import by.dima.model.logic.MessageBuilder;
 import by.dima.model.logic.repository.*;
+import by.dima.model.logic.service.ChatService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
